@@ -1,5 +1,6 @@
 CREATE SCHEMA IF NOT EXISTS ohschools;
 DROP TABLE IF EXISTS ohschools.ohcensus;
+/*
 CREATE TABLE ohschools.ohcensus (
 	pct_white DECIMAL,
 	pct_black_or_aa DECIMAL,
@@ -15,3 +16,4 @@ CREATE TABLE ohschools.ohcensus (
 );
 
 \COPY ohschools.ohcensus from 'assignment1/test.csv' WITH CSV HEADER;
+*/
