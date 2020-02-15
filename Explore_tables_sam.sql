@@ -13,6 +13,107 @@ select * from clean.all_grades
 where student_lookup = 46 and
 		term = 'Final';
 
+select 
+
+--These two districts provide non letter grades for some classes
+select distinct mark from clean.all_grades
+where --grade in (6,7,8) and 
+--length(mark) < 4 and 
+district not in ('Coshocton','Maysville');
+
+--isolating number marks
+select * from clean.all_grades
+where 
+--district in ('Coshocton','Maysville') THESE ARE THE CULPRITS, mixed grades, some letter some scores between 0-100
+term = 'Final' and
+--only taking marks that start with an integer
+left((mark),1) in ('0','1','2','3','4','5','6','7','8','9','.') and
+--class called 'Music 3' gives marks of '3' or '4'
+length(mark) != 1;
+--mapping https://en.wikipedia.org/wiki/Academic_grading_in_the_United_States
+
+
+
+--isolating 'letter grade' marks
+select distinct mark from clean.all_grades
+where term = 'Final' and
+--only taking letter grades
+mark in ('A+','A','A-','B+','B','B-','C+','C','C-','D+','D','D-','F');
+--maps to (4,4,3.7,3.3,3,2.7,2.3,2,1.7,1.3,1,0.7,0)
+--source: https://education.ohio.gov/getattachment/Topics/What-s-Happening-with-Ohio-s-Graduation-Requiremen/Graduation-Requirements-2014-2017/Alternative-Pathway-for-Diploma/Board-GPA-Calculation-Chart.pdf.aspx
+
+select * from clean.all_grades ag
+
+create or replace view gpa as 
+select a.student_lookup, 
+	a.grade, 
+	a.school_year, 
+	a.clean_term, 
+	a.course_name,
+	a.mark,
+	a.percent_of_year,
+	coalesce(a.number_gpa,a.letter_gpa,null) as grade_points
+from
+	(select ag.student_lookup, ag.grade, ag.school_year, ag.clean_term, ag.course_name, ag.mark, ag.percent_of_year,
+		case
+			when n.mark isnull then null
+			when n.mark >= 93 then 4
+			when n.mark >= 90 then 3.67
+			when n.mark >= 87 then 3.33
+			when n.mark >= 83 then 3
+			when n.mark >= 80 then 2.67
+			when n.mark >= 77 then 2.33
+			when n.mark >= 73 then 2
+			when n.mark >= 70 then 1.67
+			when n.mark >= 67 then 1.33
+			when n.mark >= 63 then 1
+			when n.mark >= 60 then 0.67
+			else 0
+		end as number_gpa, 
+		case
+			when l.mark isnull then null
+			when l.mark = 'A+' then 4
+			when l.mark = 'A' then 4
+			when l.mark = 'A-' then 3.67
+			when l.mark = 'B+' then 3.33
+			when l.mark = 'B' then 3
+			when l.mark = 'B-' then 2.67
+			when l.mark = 'C+' then 2.33
+			when l.mark = 'C' then 2
+			when l.mark = 'C-' then 1.67
+			when l.mark = 'D+' then 1.33
+			when l.mark = 'D' then 1
+			when l.mark = 'D-' then 0.67
+			else 0
+		end as letter_gpa
+	from clean.all_grades ag
+		left outer join
+			(select student_lookup,grade,course_code,school_year,cast(mark as float) as mark,clean_term from clean.all_grades
+			where left((mark),1) in ('0','1','2','3','4','5','6','7','8','9','.') and length(mark) != 1) n
+			using (student_lookup,course_code,grade,school_year,clean_term)
+		left outer join
+			(select student_lookup,grade,course_code,school_year,mark,clean_term from clean.all_grades
+			where mark in ('A+','A','A-','B+','B','B-','C+','C','C-','D+','D','D-','F')) l
+			using (student_lookup,course_code,grade,school_year,clean_term)
+	) a;
+
+	
+select count(grade_points) from sketch.gpa
+where grade in (6,7,8)
+	
+	
+	
+	
+	
+
+	left outer join
+		(select student_lookup,grade,school_year,mark from clean.all_grades
+		where mark not in ('A+','A','A-','B+','B','B-','C+','C','C-','D+','D','D-','F') or
+		left((mark),1) not in ('0','1','2','3','4','5','6','7','8','9','.')) o
+		using (student_lookup,grade,school_year);
+
+
+
 --intervention count, by student-year
 select student_lookup, right(school_year,4) as school_year,
 	count(student_lookup) as intervention_count
