@@ -1,6 +1,6 @@
 import pandas as pd
 
-def data_preparation(data, args):
+def data_preparation(data, args=None):
 
     # Variables in 8th grade
     data.loc[data['grade']==8,'gpa_8'] = data['new_gpa']
@@ -20,6 +20,14 @@ def data_preparation(data, args):
                                                        'grade_min':'min', 'grade_max':'max', 'cohort':'first'})
     data = data.reset_index()
 
+    ethnic_dummies = pd.get_dummies(data['ethnicity'])
+    data = data.drop('ethnicity',axis = 1)
+    data = data.join(ethnic_dummies)
+
+    school_dummies = pd.get_dummies(data['school_name'])
+    data = data.drop('school_name',axis = 1)
+    data = data.join(school_dummies)
+
     # Filter data to relevant students
     data = data[data['cohort'].notnull()]
     data = data[data['cohort']<=2012]
@@ -35,19 +43,18 @@ def data_preparation(data, args):
     data.loc[data['withdraw_reason']=='withdrew - death', 'graduated'] = None
     data = data[data['graduated'].notnull()]
 
-    # Filter relevant variables
-    data = data[['cohort','ethnicity','gpa_8','abs_8','int_8','school_name','graduated']]
+    # Drop aux variables
+    data = data.drop(columns=['student_lookup','graduation_date','withdraw_reason','grade_min','grade_max', 'graduated_time'])
+    data = data.dropna()
 
     return data
 
-def train_val_test_split(data):
-    train_data = data[data['cohort']<=2010]
-    validation_data = data[data['cohort']==2011]
-    test_data = data[data['cohort']==2012]
+def train_val_test_split(data, max_train_cohort, min_test_cohort):
+    train_data = data[data['cohort']<=max_train_cohort]
+    test_data = data[data['cohort']>=min_test_cohort]
 
     train_data = train_data.drop(columns=['cohort'])
-    validation_data = validation_data.drop(columns=['cohort'])
     test_data = test_data.drop(columns=['cohort'])
 
-    return train_data, validation_data, test_data
+    return train_data, test_data 
     

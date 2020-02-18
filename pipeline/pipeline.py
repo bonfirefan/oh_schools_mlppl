@@ -5,7 +5,7 @@ import time
 from utils import download_data, upload_result
 from data_preparation import data_preparation, train_val_test_split
 from models import logistic_regression, random_guess
-from evaluation import metric_auc
+from evaluation import metric_auc, accuracy
 
 model_dict = {'logistic_reg': logistic_regression,
               'random_guess': random_guess}
@@ -22,8 +22,8 @@ def main(args, config):
     # 2) Data preparation
     print(20*'=')
     print('2. Data processing...')
-    data = data_preparation(data, args = config['variables']) # TODO: args can be the filter of which vars to use
-    train_data, validation_data, test_data = train_val_test_split(data)
+    data = data_preparation(data) # TODO: args can be the filter of which vars to use
+    train_data, test_data = train_val_test_split(data, config['max_train_cohort'], config['min_test_cohort'])
 
     # 3) Model
     print(20*'=')
@@ -34,7 +34,10 @@ def main(args, config):
     # 4) Compute metric in validation set
     print(20*'=')
     print('4. Evaluation model in validation set...')
-    metric = metric_dict[config['metric']](clf, validation_data)
+    metric = metric_dict[config['metric']](clf, test_data)
+
+    test_accuracy = accuracy(clf, test_data)
+    print('Test accuracy: ', test_accuracy)
 
     # 5) Upload result to postgres
     print(20*'=')

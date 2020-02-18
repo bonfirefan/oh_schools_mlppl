@@ -1,7 +1,9 @@
 model_name: 'logistic baseline'
 model: 'logistic_reg'
-hyperparameters: [1]
+hyperparameters: [0.9]
 create_view: FALSE # Future work, if statement in pipeline
 create_model_results: FALSE # Future work, if statement in pipeline
 variables: 'all'
 metric: 'AUC'
+max_train_cohort: 2011
+min_test_cohort: 2012

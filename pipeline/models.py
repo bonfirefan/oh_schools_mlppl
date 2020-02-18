@@ -3,15 +3,14 @@ from sklearn.linear_model import LogisticRegression
 
 def logistic_regression(train_data, args=None):
 
-    train_data = train_data.dropna()
-    X_train = train_data[['gpa_8','abs_8','int_8']].values
+    X_train = train_data.drop(columns=['graduated']).values
     y_train = train_data['graduated'].values
 
     l2_penalty = args[0]
     clf = LogisticRegression(random_state=0, C=l2_penalty)
-    clf.fit(X_train,y_train)
+    clf.fit(X_train, y_train)
 
-    print('Model coefs: ', clf.coef_)
+    #print('Model coefs: ', clf.coef_)
 
     return clf
 

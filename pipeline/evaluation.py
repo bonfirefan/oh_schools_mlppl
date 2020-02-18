@@ -1,10 +1,9 @@
 from sklearn import metrics
 
-def metric_auc(clf, validation_data):
-    # Validation data
-    validation_data = validation_data.dropna()
-    X = validation_data[['gpa_8','abs_8','int_8']].values
-    y = validation_data['graduated'].values
+def metric_auc(clf, test_data):
+    # Test data
+    X = test_data.drop(columns=['graduated']).values
+    y = test_data['graduated'].values
 
     # Predictions
     y_hat = clf.predict(X)
@@ -15,6 +14,18 @@ def metric_auc(clf, validation_data):
     print('AUC: ', auc)
 
     return auc
+
+def accuracy(clf, test_data):
+    # Test data
+    X = test_data.drop(columns=['graduated']).values
+    y = test_data['graduated'].values
+
+    # Predictions
+    y_hat = clf.predict(X)
+
+    accuracy = (y_hat == y).mean()
+
+    return accuracy
 
 
 
