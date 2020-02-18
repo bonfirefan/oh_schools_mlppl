@@ -1,0 +1,7 @@
+model_name: 'logistic baseline'
+model: 'logistic_reg'
+hyperparameters: [1]
+create_view: FALSE # Future work, if statement in pipeline
+create_model_results: FALSE # Future work, if statement in pipeline
+variables: 'all'
+metric: 'AUC'
