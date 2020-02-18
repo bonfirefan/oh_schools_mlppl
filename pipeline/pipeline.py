@@ -36,6 +36,9 @@ def main(args, config):
     print('4. Evaluation model in validation set...')
     metric = metric_dict[config['metric']](clf, test_data)
 
+    # We print test and train accuracy
+    train_accuracy = accuracy(clf, train_data)
+    print('Train accuracy: ', train_accuracy) 
     test_accuracy = accuracy(clf, test_data)
     print('Test accuracy: ', test_accuracy)
 
