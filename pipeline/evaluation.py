@@ -27,5 +27,12 @@ def accuracy(clf, test_data):
 
     return accuracy
 
+def confusion_matrix(clf, test_data):
+    X = test_data.drop(columns=['graduated']).values
+    y = test_data['graduated'].values
 
-
+    # Predictions
+    y_hat = clf.predict(X)
+    confusion_matrix = pd.crosstab(y, y_hat, rownames=['Actual'], colnames=['Predicted'], normalize=True)
+    print (confusion_matrix)
+    return(confusion_matrix)

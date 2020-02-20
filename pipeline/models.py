@@ -7,10 +7,10 @@ def logistic_regression(train_data, args=None):
     y_train = train_data['graduated'].values
 
     l2_penalty = args[0]
-    clf = LogisticRegression(random_state=0, C=l2_penalty)
+    clf = LogisticRegression(random_state=0, C=l2_penalty, max_iter=500)
     clf.fit(X_train, y_train)
 
-    #print('Model coefs: ', clf.coef_)
+    print('Model coefs: ', clf.coef_)
 
     return clf
 

@@ -17,13 +17,13 @@ def main(args, config):
     # 1) Read data from database
     print(20*'=')
     print('1. Downloading data...')
-    data = download_data(user=args.user, password=args.password)
-
+    data = download_data(user=args.user, password=args.password,tb_name='sketch.train_data_2')
+    oh = download_data(user=args.user, password=args.password,tb_name='sketch.ode_school')
     # 2) Data preparation
     print(20*'=')
     print('2. Data processing...')
-    data = data_preparation(data) # TODO: args can be the filter of which vars to use
-    train_data, test_data = train_val_test_split(data, config['max_train_cohort'], config['min_test_cohort'])
+    data = data_preparation(data, oh) # TODO: args can be the filter of which vars to use
+    train_data, test_data = train_val_test_split(data, config['min_train_cohort'], config['min_test_cohort'])
 
     # 3) Model
     print(20*'=')
@@ -35,10 +35,11 @@ def main(args, config):
     print(20*'=')
     print('4. Evaluation model in validation set...')
     metric = metric_dict[config['metric']](clf, test_data)
+    print('{}: {}', config['metric'], metric)
 
     # We print test and train accuracy
     train_accuracy = accuracy(clf, train_data)
-    print('Train accuracy: ', train_accuracy) 
+    print('Train accuracy: ', train_accuracy)
     test_accuracy = accuracy(clf, test_data)
     print('Test accuracy: ', test_accuracy)
 

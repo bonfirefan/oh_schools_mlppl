@@ -5,5 +5,5 @@ create_view: FALSE # Future work, if statement in pipeline
 create_model_results: FALSE # Future work, if statement in pipeline
 variables: 'all'
 metric: 'AUC'
-max_train_cohort: 2011
+min_train_cohort: 2007
 min_test_cohort: 2012
