@@ -16,9 +16,9 @@ def download_data(user, password, tb_name, port=8888):
 
         data = _download_table(conn, tb_name)
         conn.close()
+        return data
     except:
         pass
-    return data
 
 def upload_result(model_name, metric_name, value, user, password, port=8888):
     conn_string = "host='localhost' dbname='o1_database' user='{}' password='{}' port='{}'".format(user, password, port)
